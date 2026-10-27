@@ -26,12 +26,13 @@ test('popup remains usable on a narrow mobile viewport',async({page})=>{
 
 test('popup opens at 15 seconds and does not reopen after dismissal',async({page})=>{
  await page.clock.install();
+ await page.clock.pauseAt(new Date());
  await page.goto('/');
  const popup=page.getByRole('dialog');
  // Synchronize the virtual clock to document navigation, independent of hydration.
  const elapsed=await page.evaluate(()=>performance.now());
  await page.clock.runFor(Math.max(0,14_999-elapsed));
- await expect(popup).not.toBeVisible();
+ expect(await popup.isVisible()).toBe(false);
  await page.clock.runFor(1);
  await expect(popup).toBeVisible();
  await page.keyboard.press('Escape');

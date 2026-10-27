@@ -1,3 +1,4 @@
+import {freeMarketplace} from '../../../../lib/marketplace-access.mjs';
 import {randomUUID} from 'node:crypto';
 import {NextResponse} from 'next/server';
 import {authenticate,verifyWriteOrigin} from '../../../../lib/auth';
@@ -8,9 +9,9 @@ export async function GET(req:Request){
  const s=await authenticate(req);if(s?.role!=='PROVIDER')return NextResponse.json({error:'Interzis'},{status:403});
  const p=await db.providerProfile.findUnique({where:{userId:s.id},include:{transactions:{orderBy:{createdAt:'desc'},take:20}}});
  if(!p)return NextResponse.json({error:'Profil inexistent'},{status:404});
- const pro=activePro(p);
+ const pro=!freeMarketplace()&&activePro(p);
  const stats=pro?await Promise.all([db.requestMatch.count({where:{providerId:p.id,unlockedAt:{not:null},refundedAt:null}}),db.offer.count({where:{providerId:p.id}}),db.offer.count({where:{providerId:p.id,status:'ACCEPTED'}})]):null;
- return NextResponse.json({operationKey:randomUUID(),sandbox:sandboxEnabled(),balanceBani:p.creditBalance,pro,proUntil:p.proUntil,proCancelled:p.proCancelled,transactions:p.transactions,stats:stats?{unlocked:stats[0],offers:stats[1],accepted:stats[2]}:null,prices:{leadBani:LEAD_PRICE_BANI,proBani:PRO_PRICE_BANI,topupBani:SANDBOX_TOPUP_BANI}});
+ return NextResponse.json({monetizationEnabled:!freeMarketplace(),operationKey:randomUUID(),sandbox:sandboxEnabled(),balanceBani:p.creditBalance,pro,proUntil:p.proUntil,proCancelled:p.proCancelled,transactions:p.transactions,stats:stats?{unlocked:stats[0],offers:stats[1],accepted:stats[2]}:null,prices:{leadBani:LEAD_PRICE_BANI,proBani:PRO_PRICE_BANI,topupBani:SANDBOX_TOPUP_BANI}});
 }
 export async function PATCH(req:Request){
  if(!verifyWriteOrigin(req))return NextResponse.json({error:'Origine invalidă'},{status:403});

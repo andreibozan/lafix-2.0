@@ -16,7 +16,7 @@ export default function ProjectPopup(){
    setStage('idea');dialog.current.showModal();setOpen(true);
   };
   // performance.now() starts at document navigation, so hydration does not add delay.
-  timer=setTimeout(show,Math.max(0,15_000-performance.now()));
+  timer=setTimeout(show,Math.max(0,Math.ceil(15_000-performance.now())));
   window.addEventListener('lafix:project',show);
   return()=>{clearTimeout(timer);window.removeEventListener('lafix:project',show)};
  },[]);

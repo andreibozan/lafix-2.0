@@ -1,3 +1,4 @@
+export const dynamic='force-dynamic';
 import RequestForm from './request-form';
 import AudienceSwitch from './components/audience-switch';
 import ProviderFrontIntro from './components/provider-front-intro';

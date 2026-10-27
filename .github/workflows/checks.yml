@@ -19,6 +19,7 @@ jobs:
       AUTH_SECRET: ci-only-placeholder-with-more-than-32-characters
       APP_ORIGIN: http://localhost:3000
       TEST_BASE_URL: http://localhost:3000
+      MARKETPLACE_MODE: paid
       BILLING_MODE: sandbox
       ALLOW_LOCAL_HTTP_AUTH: "true"
     steps:

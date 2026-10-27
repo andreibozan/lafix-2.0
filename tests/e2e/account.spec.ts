@@ -6,5 +6,5 @@ test('Romanian public site and server-enforced admin access',async({page})=>{
 });
 test('invalid login reports Romanian error',async({page})=>{
  test.skip(!process.env.DATABASE_URL,'Requires test PostgreSQL');await page.goto('/account');
- await page.getByLabel('Email',{exact:true}).fill('absent@example.invalid');await page.getByLabel('Parolă',{exact:true}).fill('invalid-password');await page.getByRole('button',{name:'Intră în cont',exact:true}).click();await expect(page.getByRole('alert')).toContainText('Email sau parolă incorecte');
+ await page.getByLabel('Email',{exact:true}).fill('absent@example.invalid');await page.getByLabel('Parolă',{exact:true}).fill('invalid-password');await page.getByRole('button',{name:'Intră în cont',exact:true}).click();await expect(page.getByRole('alert').filter({hasText:'Email sau parolă incorecte'})).toContainText('Email sau parolă incorecte');
 });

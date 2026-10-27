@@ -16,6 +16,8 @@ services:
         value: "22"
       - key: DEPLOYMENT_STAGE
         value: staging
+      - key: MARKETPLACE_MODE
+        value: free
       - key: BILLING_MODE
         value: disabled
       - key: ALLOW_LOCAL_HTTP_AUTH

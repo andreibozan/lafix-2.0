@@ -1,4 +1,5 @@
 import {NextResponse} from 'next/server';
+import {canAccessMatch} from '../../../../../../lib/marketplace-access.mjs';
 import {z} from 'zod';
 import {authenticate,verifyWriteOrigin} from '../../../../../../lib/auth';
 import {BillingError,billingFailure,billingTransaction} from '../../../../../../lib/billing';
@@ -10,8 +11,8 @@ export async function POST(req:Request,{params}:{params:Promise<{id:string}>}){
  try{await billingTransaction(async tx=>{
   await tx.$queryRaw`SELECT id FROM "ServiceRequest" WHERE id=${id} FOR UPDATE`;
   const p=await tx.providerProfile.findUnique({where:{userId:s.id}});if(p?.status!=='APPROVED')throw new BillingError('Interzis',403);
-  const m=await tx.requestMatch.findUnique({where:{requestId_providerId:{requestId:id,providerId:p.id}}});
-  if(!m?.unlockedAt||m.refundedAt)throw new BillingError('Oportunitate indisponibilă.',404);
+  const m=await tx.requestMatch.findUnique({where:{requestId_providerId:{requestId:id,providerId:p.id}},include:{request:true}});
+  if(!m||!canAccessMatch(m,m.request))throw new BillingError('Oportunitate indisponibilă.',404);
   if(await tx.leadReport.findUnique({where:{matchId:m.id}}))return;
   await tx.leadReport.create({data:{matchId:m.id,reason:parsed.data.reason,note:parsed.data.note}});
   await tx.auditEvent.create({data:{actorId:s.id,action:'LEAD_REPORTED',resourceId:m.id,note:`${parsed.data.reason}: ${parsed.data.note}`}});
