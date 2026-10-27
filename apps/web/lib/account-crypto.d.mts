@@ -1,0 +1,10 @@
+export function encryptionReady(env?:NodeJS.ProcessEnv):boolean;
+export function seal(value:string,purpose:string):string;
+export function unseal(value:string,purpose:string):string;
+export function tokenHash(value:string):string;
+export function newToken():string;
+export function base32(buffer:Uint8Array):string;
+export function newTotpSecret():string;
+export function totp(secret:string,seconds?:number,digits?:number):string;
+export function verifyTotp(secret:string,code:string,lastCounter?:bigint|null,seconds?:number):bigint|null;
+export function recoveryCodes():string[];

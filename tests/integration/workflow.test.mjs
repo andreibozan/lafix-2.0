@@ -1,3 +1,4 @@
+import {adminSecurityData,syntheticRecovery,verifiedAccount} from '../helpers/accounts.mjs';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {PrismaClient} from '@prisma/client';
@@ -12,10 +13,10 @@ test('real PostgreSQL: roles, concurrent matching, offers, ownership, acceptance
  async function call(path,token,body,method=body?'POST':'GET'){
   return fetch(base+path,{method,headers:{'content-type':'application/json',...(token?{authorization:`Bearer ${token}`}:{})},...(body?{body:JSON.stringify(body)}:{})});
  }
- async function account(role,i){const r=await call('/api/auth/register',null,{role,name:'Test sintetic',email:`test-${suffix}-${i}@example.invalid`,password,...(role==='PROVIDER'?{businessName:`Test ${i}`,phone:'0700000000',categories:['Renovări'],counties:['Hunedoara']}:{})});const j=await r.json();assert.equal(r.status,201,JSON.stringify(j));users.push(j.user.id);return j;}
+ async function account(role,i){const j=await verifiedAccount(base,db,{role,name:'Test sintetic',email:`test-${suffix}-${i}@example.invalid`,password,...(role==='PROVIDER'?{businessName:`Test ${i}`,phone:'0700000000',categories:['Renovări'],counties:['Hunedoara']}:{})});users.push(j.user.id);return j;}
  try{
- const admin=await db.user.create({data:{email:`admin-${suffix}@example.invalid`,name:'Test admin',role:'ADMIN',passwordHash:await hash(password,12)}});users.push(admin.id);
- const login=await call('/api/auth/login',null,{email:admin.email,password});assert.equal(login.status,200);const a=(await login.json()).token;
+ const admin=await db.user.create({data:{email:`admin-${suffix}@example.invalid`,name:'Test admin',role:'ADMIN',...adminSecurityData(),passwordHash:await hash(password,12)}});users.push(admin.id);
+ const login=await call('/api/auth/login',null,{email:admin.email,password,otp:syntheticRecovery});assert.equal(login.status,200);const a=(await login.json()).token;
  const client=await account('CLIENT','client'),stranger=await account('CLIENT','stranger');
  assert.equal((await call('/api/auth/login',null,{email:client.user.email,password,expectedRole:'ADMIN'})).status,401);
  const clientLogin=await call('/api/auth/login',null,{email:client.user.email,password,next:'/admin'});assert.equal(clientLogin.status,200);assert.equal((await clientLogin.json()).redirectTo,'/dashboard');

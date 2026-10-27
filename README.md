@@ -2,6 +2,12 @@
 
 Monorepo cu `apps/web` (Next.js 15, React 19, Prisma/PostgreSQL) și `apps/mobile` (Expo 54, React Native).
 
+## Securitatea conturilor și solicitări fără cont
+
+Verificare email, recuperare parolă, TOTP/2FA și coduri de recuperare: [docs/ACCOUNT_SECURITY.md](docs/ACCOUNT_SECURITY.md). Trimiterea efectivă a emailurilor necesită un expeditor și credențiale configurate privat. Backupul gestionat necesită activarea unui plan compatibil; nu este activ pe Free.
+
+Pop-up-ul permite solicitări fără cont printr-un flux separat, cu verificarea acordului și ticket de unică utilizare. Formularul din pagină rămâne autentificat: [docs/POPUP_GUEST.md](docs/POPUP_GUEST.md).
+
 ## Configurare online de test
 
 Configurația Render este pregătită în `render.yaml`, cu acces prin parolă, bază `lafix_staging`, secrete generate de furnizor și plăți dezactivate. Niciun serviciu nu a fost creat. Pași și limite: [docs/STAGING.md](docs/STAGING.md). PostgreSQL Free expiră după 30 de zile; nu este găzduire permanentă.

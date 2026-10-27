@@ -19,6 +19,9 @@ jobs:
       AUTH_SECRET: ci-only-placeholder-with-more-than-32-characters
       APP_ORIGIN: http://localhost:3000
       TEST_BASE_URL: http://localhost:3000
+      DEPLOYMENT_STAGE: test
+      MAIL_DELIVERY_MODE: outbox
+      AUTH_ENCRYPTION_KEY: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
       MARKETPLACE_MODE: paid
       BILLING_MODE: sandbox
       ALLOW_LOCAL_HTTP_AUTH: "true"
@@ -41,6 +44,18 @@ jobs:
           curl -fsS http://localhost:3000/api/health
           npm test
           npm run test:integration
+      - name: Rehearse isolated PostgreSQL backup and restore
+        env:
+          PGPASSWORD: test-only
+          RESTORE_CHECK_DATABASE_URL: postgresql://lafix:test-only@localhost:5432/lafix_restore_check
+        run: |
+          node scripts/backup-rehearsal.mjs --prepare
+          docker exec ${{ job.services.postgres.id }} pg_dump -U lafix -d lafix_test -Fc > /tmp/lafix-synthetic-backup.dump
+          docker exec ${{ job.services.postgres.id }} createdb -U lafix lafix_restore_check
+          docker exec -i ${{ job.services.postgres.id }} pg_restore -U lafix -d lafix_restore_check --exit-on-error < /tmp/lafix-synthetic-backup.dump
+          node scripts/backup-rehearsal.mjs --verify
+          node scripts/backup-rehearsal.mjs --cleanup
+          rm /tmp/lafix-synthetic-backup.dump
       - name: Install browser for end-to-end tests
         timeout-minutes: 10
         run: npx playwright install --with-deps chromium
