@@ -1,5 +1,6 @@
 import {PrismaClient} from '@prisma/client';
-import {hash} from 'bcryptjs';
+import bcrypt from 'bcryptjs';
+const {hash} = bcrypt;
 import {createInterface} from 'node:readline/promises';
 import {Writable} from 'node:stream';
 import {stdin,stdout} from 'node:process';

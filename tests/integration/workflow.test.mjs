@@ -1,7 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {PrismaClient} from '@prisma/client';
-import {hash} from 'bcryptjs';
+import bcrypt from 'bcryptjs';
+const {hash} = bcrypt;
 import {randomUUID} from 'node:crypto';
 const base=process.env.TEST_BASE_URL||'http://localhost:3000';
 const password='Synthetic-test-password-123!';

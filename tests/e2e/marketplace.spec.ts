@@ -1,6 +1,7 @@
 import {test,expect} from '@playwright/test';
 import {PrismaClient} from '@prisma/client';
-import {hash} from 'bcryptjs';
+import bcrypt from 'bcryptjs';
+const {hash} = bcrypt;
 import {randomUUID} from 'node:crypto';
 test('customer → admin approval and matching → provider offer → customer acceptance',async({page,request})=>{
  test.skip(!process.env.DATABASE_URL,'Requires dedicated PostgreSQL');

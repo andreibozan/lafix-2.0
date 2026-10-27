@@ -1,7 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {PrismaClient} from '@prisma/client';
-import {hash} from 'bcryptjs';
+import bcrypt from 'bcryptjs';
+const {hash} = bcrypt;
 import {decodeJwt} from 'jose';
 import {randomUUID,createHmac} from 'node:crypto';
 const base=process.env.TEST_BASE_URL||'http://localhost:3000';
