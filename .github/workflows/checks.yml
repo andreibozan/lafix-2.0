@@ -30,7 +30,6 @@ jobs:
       - run: npm ci
       - run: npm run db:generate
       - run: npm run db:migrate
-      - run: npm test
       - run: npm run typecheck
       - run: npm run build
       - run: npx playwright install --with-deps chromium
@@ -39,5 +38,6 @@ jobs:
           trap 'cat /tmp/lafix-server.log' EXIT
           for i in $(seq 1 60); do curl -fsS http://localhost:3000/api/health && break; sleep 1; done
           curl -fsS http://localhost:3000/api/health
+          npm test
           npm run test:integration
           npm run test:e2e
