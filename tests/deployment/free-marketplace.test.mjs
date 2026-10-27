@@ -1,3 +1,4 @@
+import {adminSecurityData,syntheticRecovery,verifiedAccount} from '../helpers/accounts.mjs';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
@@ -17,9 +18,9 @@ test('free launch: approval, max-three assignment, contact, offers and acceptanc
  const call=(path,token,body,method=body?'POST':'GET')=>fetch(base+path,{method,headers:{'content-type':'application/json',...(token?{authorization:`Bearer ${token}`}:{})},...(body?{body:JSON.stringify(body)}:{})});
  try{
   let ready=false;for(let i=0;i<100;i++){if(child.exitCode!==null)throw Error('Server stopped');try{const r=await fetch(base+'/api/health');if(r.ok){ready=true;break}}catch{}await delay(100)}assert.ok(ready);
-  const admin=await db.user.create({data:{email:`admin-${suffix}@example.invalid`,name:'Admin sintetic',role:'ADMIN',passwordHash:await bcrypt.hash(password,12)}});users.push(admin.id);
-  const a=await(await call('/api/auth/login',null,{email:admin.email,password})).json();
-  async function register(role,i){const r=await call('/api/auth/register',null,{role,email:`free-${suffix}-${i}@example.invalid`,name:'Test sintetic',password,...(role==='PROVIDER'?{businessName:`Firma ${i}`,phone:'0700000000',categories:['Renovări'],counties:['Hunedoara']}:{})});assert.equal(r.status,201);const j=await r.json();users.push(j.user.id);return j}
+  const admin=await db.user.create({data:{email:`admin-${suffix}@example.invalid`,name:'Admin sintetic',role:'ADMIN',...adminSecurityData(),passwordHash:await bcrypt.hash(password,12)}});users.push(admin.id);
+  const a=await(await call('/api/auth/login',null,{email:admin.email,password,otp:syntheticRecovery})).json();
+  async function register(role,i){const j=await verifiedAccount(base,db,{role,email:`free-${suffix}-${i}@example.invalid`,name:'Test sintetic',password,...(role==='PROVIDER'?{businessName:`Firma ${i}`,phone:'0700000000',categories:['Renovări'],counties:['Hunedoara']}:{})});users.push(j.user.id);return j}
   const client=await register('CLIENT','client'),providers=[];
   for(let i=0;i<4;i++){const p=await register('PROVIDER',i);const profile=await db.providerProfile.findUniqueOrThrow({where:{userId:p.user.id}});p.profile=profile;assert.equal((await call(`/api/admin/providers/${profile.id}`,a.token,{status:'APPROVED'},'PATCH')).status,200);providers.push(p)}
   const created=await call('/api/requests',client.token,{contactName:'Client sintetic',contactEmail:'synthetic@example.invalid',contactPhone:'0700000000',category:'Renovări',county:'Hunedoara',locality:'Deva',description:'Solicitare sintetică pentru lansarea gratuită.'});assert.equal(created.status,201);requestId=(await created.json()).id;

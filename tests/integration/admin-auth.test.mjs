@@ -1,3 +1,4 @@
+import {adminSecurityData,syntheticRecovery,verifiedAccount} from '../helpers/accounts.mjs';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {PrismaClient} from '@prisma/client';
@@ -12,10 +13,10 @@ test('admin login requires database role, limits attempts and does not expose cr
  let id;
  const post=(path,data)=>fetch(base+path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(data)});
  try{
- const u=await db.user.create({data:{email,name:'Admin sintetic',passwordHash:await hash(password,12),role:'ADMIN'}});id=u.id;
+ const u=await db.user.create({data:{email,name:'Admin sintetic',passwordHash:await hash(password,12),role:'ADMIN',...adminSecurityData()}});id=u.id;
  const denied=await post('/api/auth/register',{email:`public-${suffix}@example.invalid`,password,name:'Test',role:'ADMIN'});assert.equal(denied.status,400);
  const unauthenticated=await fetch(base+'/admin',{redirect:'manual'});assert.ok([307,308].includes(unauthenticated.status));assert.match(unauthenticated.headers.get('location'),/admin\/login/);
- const r=await post('/api/auth/login',{email,password,expectedRole:'ADMIN'});assert.equal(r.status,200);const data=await r.json();assert.equal(data.redirectTo,'/admin');
+ const r=await post('/api/auth/login',{email,password,otp:syntheticRecovery,expectedRole:'ADMIN'});assert.equal(r.status,200);const data=await r.json();assert.equal(data.redirectTo,'/admin');
  const jwt=decodeJwt(data.token);assert.equal(jwt.iss,'lafix');assert.equal(jwt.aud,'lafix-app');assert.equal(jwt.exp-jwt.iat,7200);
  const cookie=r.headers.get('set-cookie');assert.match(cookie,/HttpOnly/i);assert.match(cookie,/SameSite=Lax/i);assert.match(cookie,/Max-Age=7200/i);
  const rows=await fetch(base+'/api/admin/overview?view=customers',{headers:{authorization:`Bearer ${data.token}`}});assert.equal(rows.status,200);assert.doesNotMatch(await rows.text(),/passwordHash|lafix_session|AUTH_SECRET/);

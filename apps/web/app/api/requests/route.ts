@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   if(!parsed.success) return NextResponse.json({error:'Date invalide',details:parsed.error.flatten()},{status:400});
   const session=await authenticate(req);
   if(!session || session.role!=='CLIENT') return NextResponse.json({error:'Autentifică-te ca utilizator pentru a trimite o solicitare'},{status:401});
-  const request=await db.serviceRequest.create({data:{...parsed.data,clientId:session.id}});
+  const request=await db.serviceRequest.create({data:{...parsed.data,clientId:session.id,consentAt:new Date()}});
   return NextResponse.json({id:request.id,status:request.status},{status:201});
  } catch { return NextResponse.json({error:'Solicitarea nu a putut fi procesată'},{status:500}); }
 }

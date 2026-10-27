@@ -22,6 +22,8 @@ services:
         value: disabled
       - key: ALLOW_LOCAL_HTTP_AUTH
         value: "false"
+      - key: AUTH_ENCRYPTION_KEY
+        generateValue: true
       - key: AUTH_SECRET
         generateValue: true
       - key: STAGING_ACCESS_PASSWORD

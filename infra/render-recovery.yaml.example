@@ -1,0 +1,12 @@
+# REVIEW ONLY: paid database recovery. Do not import or sync without cost approval.
+# This targets the EXISTING staging database by its verified Blueprint name.
+# Copy the approved change to render.yaml only after reviewing the live quoted price.
+databases:
+  - name: lafix-staging-db
+    region: frankfurt
+    plan: 0.1c-256mb
+    diskSizeGB: 1
+    storageAutoscalingEnabled: false
+    databaseName: lafix_staging
+    user: lafix
+    ipAllowList: []

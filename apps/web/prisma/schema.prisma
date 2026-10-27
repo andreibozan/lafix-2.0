@@ -33,6 +33,14 @@ model User {
  email String @unique
  name String
  passwordHash String
+ emailVerifiedAt DateTime?
+ mfaSecret String?
+ mfaPendingSecret String?
+ mfaPendingExpiresAt DateTime?
+ mfaEnabledAt DateTime?
+ mfaLastCounter BigInt?
+ mfaRecoveryHashes String[] @default([])
+ actionTokens AccountActionToken[]
  role Role @default(CLIENT)
  createdAt DateTime @default(now())
  sessions Session[]
@@ -60,6 +68,9 @@ model ProviderProfile {
  @@index([createdAt])
 }
 model ServiceRequest {
+ requestSource String @default("ACCOUNT")
+ consentAt DateTime?
+ guestTicketHash String? @unique
  id String @id @default(cuid())
  clientId String?
  client User? @relation(fields:[clientId],references:[id])
@@ -117,6 +128,7 @@ model Session {
  userId String
  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
  expiresAt DateTime
+ mfaVerified Boolean @default(false)
  @@index([expiresAt])
 }
 
@@ -178,4 +190,30 @@ model AuthAttemptBucket {
  attempts Int @default(1)
  resetAt DateTime
  @@index([resetAt])
+}
+
+model AccountActionToken {
+ id String @id @default(cuid())
+ userId String
+ user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+ kind String
+ tokenHash String @unique
+ expiresAt DateTime
+ usedAt DateTime?
+ createdAt DateTime @default(now())
+ @@index([userId,kind,createdAt])
+ @@index([expiresAt])
+}
+model EmailOutbox {
+ id String @id @default(cuid())
+ payload String
+ attempts Int @default(0)
+ nextAttemptAt DateTime @default(now())
+ leaseUntil DateTime?
+ sentAt DateTime?
+ lastError String?
+ createdAt DateTime @default(now())
+ expiresAt DateTime
+ @@index([sentAt,nextAttemptAt])
+ @@index([expiresAt])
 }
