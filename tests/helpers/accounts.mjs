@@ -5,7 +5,7 @@ export function adminSecurityData(){return {emailVerifiedAt:new Date(),mfaSecret
 export async function actionTokenForTest(db,email){
  assert.match(process.env.DATABASE_URL||'',/\/lafix_test(?:\?|$)/);
  const rows=await db.emailOutbox.findMany({where:{sentAt:null,payload:{not:''}},orderBy:{createdAt:'desc'},take:200});
- for(const row of rows){const message=JSON.parse(unseal(row.payload,'mail'));if(message.to===email){const url=message.text.match(/https?:\/\/\S+/)?.[0];if(url)return {token:new URLSearchParams(new URL(url).hash.slice(1)).get('token'),outboxId:row.id}}}
+ for(const row of rows){const message=JSON.parse(unseal(row.payload,'mail'));if(message.to.toLowerCase()===email.toLowerCase()){const url=message.text.match(/https?:\/\/\S+/)?.[0];if(url)return {token:new URLSearchParams(new URL(url).hash.slice(1)).get('token'),outboxId:row.id}}}
  throw Error('Synthetic email not found');
 }
 export async function verifiedAccount(base,db,body){
