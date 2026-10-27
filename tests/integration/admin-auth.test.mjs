@@ -21,7 +21,7 @@ test('admin login requires database role, limits attempts and does not expose cr
  const rows=await fetch(base+'/api/admin/overview?view=customers',{headers:{authorization:`Bearer ${data.token}`}});assert.equal(rows.status,200);assert.doesNotMatch(await rows.text(),/passwordHash|lafix_session|AUTH_SECRET/);
  for(let attempt=0;attempt<10;attempt++)assert.equal((await post('/api/auth/login',{email:unknown,password:'wrong-password'})).status,401);
  const blocked=await post('/api/auth/login',{email:unknown,password:'wrong-password'});assert.equal(blocked.status,429);assert.ok(Number(blocked.headers.get('retry-after'))>0);
- const out=await fetch(base+'/api/auth/logout',{method:'POST',headers:{authorization:`Bearer ${data.token}`,'content-type':'application/json'},body:'{}'});assert.equal(out.status,200);
+ const out=await fetch(base+'/api/auth/logout',{method:'POST',headers:{authorization:`Basic ${Buffer.from('preview:synthetic-preview-password').toString('base64')}`,cookie:`lafix_session=${data.token}`,origin:process.env.APP_ORIGIN,'content-type':'application/json'},body:'{}'});assert.equal(out.status,200);
  assert.equal((await fetch(base+'/api/admin/overview',{headers:{authorization:`Bearer ${data.token}`}})).status,401);
  }finally{
  if(id){await db.auditEvent.deleteMany({where:{actorId:id}});await db.user.deleteMany({where:{id}})}

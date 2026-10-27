@@ -1,0 +1,38 @@
+# Synthetic preview only. Importing this file creates hosted resources.
+# Review the provider's current limits and any charges before confirming creation.
+services:
+  - type: web
+    name: lafix-staging-web
+    runtime: node
+    region: frankfurt
+    plan: free
+    branch: main
+    autoDeployTrigger: off
+    buildCommand: npm ci --include=dev && npm run db:generate && npm run build
+    startCommand: node scripts/start-staging.mjs
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DEPLOYMENT_STAGE
+        value: staging
+      - key: BILLING_MODE
+        value: disabled
+      - key: ALLOW_LOCAL_HTTP_AUTH
+        value: "false"
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: STAGING_ACCESS_PASSWORD
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: lafix-staging-db
+          property: connectionString
+
+databases:
+  - name: lafix-staging-db
+    region: frankfurt
+    plan: free
+    databaseName: lafix_staging
+    user: lafix
+    ipAllowList: []

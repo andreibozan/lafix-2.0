@@ -2,6 +2,10 @@
 
 Monorepo cu `apps/web` (Next.js 15, React 19, Prisma/PostgreSQL) și `apps/mobile` (Expo 54, React Native).
 
+## Configurare online de test
+
+Configurația Render este pregătită în `render.yaml`, cu acces prin parolă, bază `lafix_staging`, secrete generate de furnizor și plăți dezactivate. Niciun serviciu nu a fost creat. Pași și limite: [docs/STAGING.md](docs/STAGING.md). PostgreSQL Free expiră după 30 de zile; nu este găzduire permanentă.
+
 ## Administrare și acces — actualizare 27 octombrie 2026
 
 Panou cu șapte secțiuni de urmărire, filtre, indicatori și audit; autentificare ADMIN separată la `/admin/login`, cu previzualizare fictivă la `/demo/admin`. Pagina prestatorilor este integrată în navigarea și stilul original al primei pagini. Configurare, verificări și limite: [docs/ADMIN_AUTH.md](docs/ADMIN_AUTH.md).

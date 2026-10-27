@@ -32,7 +32,7 @@ jobs:
       - run: npm run db:migrate
       - run: npm run typecheck
       - run: npm run build
-      - run: npx playwright install --with-deps chromium
+      - run: node --test tests/deployment/*.test.mjs
       - run: |
           npm run start -w apps/web > /tmp/lafix-server.log 2>&1 &
           trap 'cat /tmp/lafix-server.log' EXIT
@@ -40,4 +40,7 @@ jobs:
           curl -fsS http://localhost:3000/api/health
           npm test
           npm run test:integration
-          npm run test:e2e
+      - name: Install browser for end-to-end tests
+        timeout-minutes: 10
+        run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
