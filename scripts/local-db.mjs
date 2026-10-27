@@ -1,0 +1,10 @@
+import EmbeddedPostgres from 'embedded-postgres';
+import {randomBytes} from 'node:crypto';
+import {mkdirSync,writeFileSync} from 'node:fs';
+const password=randomBytes(24).toString('hex');
+const pg=new EmbeddedPostgres({databaseDir:process.env.LAFIX_DB_DIR||'../../work/postgres',user:'lafix',password,port:55432,persistent:false,initdbFlags:['-c','shared_memory_type=mmap','-c','dynamic_shared_memory_type=mmap'],postgresFlags:['-h','127.0.0.1','-c','shared_memory_type=mmap','-c','dynamic_shared_memory_type=mmap'],onLog:()=>{}});
+await pg.initialise();await pg.start();await pg.createDatabase('lafix_test');
+writeFileSync('apps/web/.env',`DATABASE_URL="postgresql://lafix:${password}@127.0.0.1:55432/lafix_test"\nAUTH_SECRET="${randomBytes(48).toString('hex')}"\nAPP_ORIGIN=http://localhost:3000\n`,{mode:0o600});
+console.log('Synthetic local PostgreSQL ready on 127.0.0.1:55432. Temporary credentials written to ignored apps/web/.env.');
+for(const signal of ['SIGINT','SIGTERM'])process.on(signal,async()=>{await pg.stop();process.exit()});
+setInterval(()=>{},60000);

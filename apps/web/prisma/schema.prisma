@@ -1,0 +1,181 @@
+generator client {
+ provider = "prisma-client-js"
+}
+datasource db {
+ provider = "postgresql"
+ url = env("DATABASE_URL")
+}
+enum Role {
+ CLIENT
+ PROVIDER
+ ADMIN
+}
+enum RequestStatus {
+ OPEN
+ MATCHED
+ QUOTED
+ ACCEPTED
+ CLOSED
+ CANCELLED
+}
+enum ProviderStatus {
+ PENDING
+ APPROVED
+ SUSPENDED
+}
+enum OfferStatus {
+ SENT
+ ACCEPTED
+ REJECTED
+}
+model User {
+ id String @id @default(cuid())
+ email String @unique
+ name String
+ passwordHash String
+ role Role @default(CLIENT)
+ createdAt DateTime @default(now())
+ sessions Session[]
+ requests ServiceRequest[]
+ provider ProviderProfile?
+ @@index([createdAt])
+}
+model ProviderProfile {
+ id String @id @default(cuid())
+ userId String @unique
+ user User @relation(fields:[userId],references:[id])
+ businessName String
+ phone String
+ categories String[]
+ counties String[]
+ status ProviderStatus @default(PENDING)
+ creditBalance Int @default(0)
+ proUntil DateTime?
+ proCancelled Boolean @default(false)
+ templates OfferTemplate[]
+ transactions BillingTransaction[]
+ matches RequestMatch[]
+ offers Offer[]
+ createdAt DateTime @default(now())
+ @@index([createdAt])
+}
+model ServiceRequest {
+ id String @id @default(cuid())
+ clientId String?
+ client User? @relation(fields:[clientId],references:[id])
+ contactName String
+ contactEmail String
+ contactPhone String
+ category String
+ county String
+ locality String
+ description String
+ budgetMin Int?
+ budgetMax Int?
+ qualification QualificationStatus @default(PENDING)
+ qualifiedAt DateTime?
+ qualifiedBy String?
+ qualificationNote String?
+ leadPriceBani Int @default(2000)
+ status RequestStatus @default(OPEN)
+ matches RequestMatch[]
+ offers Offer[]
+ createdAt DateTime @default(now())
+ @@index([category,county,status])
+ @@index([createdAt])
+}
+model RequestMatch {
+ report LeadReport?
+ unlockedAt DateTime?
+ pricePaidBani Int?
+ refundedAt DateTime?
+ refundReason String?
+ id String @id @default(cuid())
+ requestId String
+ providerId String
+ request ServiceRequest @relation(fields:[requestId],references:[id])
+ provider ProviderProfile @relation(fields:[providerId],references:[id])
+ createdAt DateTime @default(now())
+ @@unique([requestId,providerId])
+}
+model Offer {
+ id String @id @default(cuid())
+ requestId String
+ providerId String
+ request ServiceRequest @relation(fields:[requestId],references:[id])
+ provider ProviderProfile @relation(fields:[providerId],references:[id])
+ amount Int
+ message String
+ status OfferStatus @default(SENT)
+ createdAt DateTime @default(now())
+ @@unique([requestId,providerId])
+ @@index([createdAt])
+}
+
+model Session {
+ id String @id
+ userId String
+ user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ expiresAt DateTime
+ @@index([expiresAt])
+}
+
+enum QualificationStatus {
+ PENDING
+ QUALIFIED
+ REJECTED
+}
+model BillingTransaction {
+ id String @id @default(cuid())
+ providerId String
+ provider ProviderProfile @relation(fields:[providerId],references:[id],onDelete:Cascade)
+ kind String
+ amountBani Int
+ reference String @unique
+ createdAt DateTime @default(now())
+ @@index([providerId,createdAt])
+}
+model OfferTemplate {
+ id String @id @default(cuid())
+ providerId String
+ provider ProviderProfile @relation(fields:[providerId],references:[id],onDelete:Cascade)
+ title String
+ message String
+ createdAt DateTime @default(now())
+ @@index([providerId])
+}
+model AuditEvent {
+ id String @id @default(cuid())
+ actorId String
+ action String
+ resourceId String
+ note String?
+ createdAt DateTime @default(now())
+ @@index([resourceId,createdAt])
+ @@index([createdAt])
+}
+
+enum ReportStatus {
+ OPEN
+ RESOLVED
+ DISMISSED
+}
+model LeadReport {
+ id String @id @default(cuid())
+ matchId String @unique
+ match RequestMatch @relation(fields:[matchId],references:[id],onDelete:Cascade)
+ reason String
+ note String
+ status ReportStatus @default(OPEN)
+ resolutionNote String?
+ resolvedBy String?
+ resolvedAt DateTime?
+ createdAt DateTime @default(now())
+ @@index([status,createdAt])
+}
+model AuthAttemptBucket {
+ id String @id
+ attempts Int @default(1)
+ resetAt DateTime
+ @@index([resetAt])
+}

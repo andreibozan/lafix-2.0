@@ -1,0 +1,31 @@
+{
+  "name": "@lafix/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "admin:create": "node scripts/create-admin.mjs",
+    "db:migrate": "prisma migrate deploy",
+    "auth:cleanup": "node scripts/cleanup-auth.mjs"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.0",
+    "bcryptjs": "^2.4.3",
+    "jose": "^5.9.6",
+    "next": "^15.5.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.1.0",
+    "prisma": "^6.16.0",
+    "typescript": "^5.9.0"
+  }
+}

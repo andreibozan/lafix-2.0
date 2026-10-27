@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "LaFix",
+    "slug": "lafix",
+    "scheme": "lafix",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "ios": {
+      "bundleIdentifier": "ro.lafix.app"
+    },
+    "android": {
+      "package": "ro.lafix.app"
+    }
+  }
+}
