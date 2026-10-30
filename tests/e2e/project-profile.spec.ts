@@ -1,0 +1,3 @@
+import {test,expect} from '@playwright/test';
+test('professional profile editor handles missing authentication without exposing data',async({page})=>{await page.goto('/dashboard/profil');await expect(page.getByRole('heading',{name:'Profil profesional'})).toBeVisible();await expect(page.getByRole('status')).toContainText('Autentifică-te ca prestator');await expect(page.getByRole('button',{name:'Salvează profilul'})).toHaveCount(0)});
+test('intervention queue denies anonymous access',async({page})=>{await page.goto('/admin/interventii');await expect(page.getByRole('status')).toContainText('Acces rezervat administratorului');await expect(page.getByRole('button',{name:'Salvează urmărirea'})).toHaveCount(0)});

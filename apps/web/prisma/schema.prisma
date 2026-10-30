@@ -52,6 +52,8 @@ model ProviderProfile {
  id String @id @default(cuid())
  userId String @unique
  user User @relation(fields:[userId],references:[id])
+ biography String @default("")
+ availability String @default("")
  businessName String
  phone String
  categories String[]
@@ -68,6 +70,12 @@ model ProviderProfile {
  @@index([createdAt])
 }
 model ServiceRequest {
+ completedAt DateTime?
+ reviewRating Int?
+ reviewText String?
+ reviewPublished Boolean @default(false)
+ followUpOwner String?
+ followUpNote String?
  requestSource String @default("ACCOUNT")
  consentAt DateTime?
  guestTicketHash String? @unique
@@ -115,6 +123,10 @@ model Offer {
  providerId String
  request ServiceRequest @relation(fields:[requestId],references:[id])
  provider ProviderProfile @relation(fields:[providerId],references:[id])
+ scope String @default("")
+ materials String @default("")
+ timeframe String @default("")
+ warranty String @default("")
  amount Int
  message String
  status OfferStatus @default(SENT)

@@ -6,7 +6,9 @@
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
-    "ios": "expo start --ios"
+    "ios": "expo start --ios",
+    "export:release-check": "expo export --platform ios --platform android",
+    "config:check": "expo config --type public"
   },
   "dependencies": {
     "expo": "~54.0.0",
