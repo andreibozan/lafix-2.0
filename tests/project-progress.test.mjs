@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {projectProgress} from '../apps/web/lib/project-progress.mjs';
+test('project stages reflect persisted transitions and cancellation',()=>{for(const [status,step] of [['OPEN',1],['MATCHED',2],['QUOTED',3],['ACCEPTED',4],['CLOSED',5],['CANCELLED',-1]])assert.equal(projectProgress({status}).step,step);assert.equal(projectProgress({status:'OPEN',qualification:'QUALIFIED'}).label,'Pregătită pentru alocare')});

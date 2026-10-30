@@ -7,3 +7,14 @@ node_modules
 *.tsbuildinfo
 playwright-report/
 test-results/
+
+# Mobile signing credentials and local build artifacts
+credentials.json
+*.p12
+*.mobileprovision
+*.jks
+*.keystore
+*.ipa
+*.aab
+*.apk
+apps/mobile/dist/

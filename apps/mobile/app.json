@@ -3,13 +3,24 @@
     "name": "LaFix",
     "slug": "lafix",
     "scheme": "lafix",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "ios": {
-      "bundleIdentifier": "ro.lafix.app"
+      "bundleIdentifier": "ro.lafix.app",
+      "supportsTablet": false
     },
     "android": {
-      "package": "ro.lafix.app"
-    }
+      "package": "ro.lafix.app",
+      "allowBackup": false,
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO"
+      ]
+    },
+    "userInterfaceStyle": "light",
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }
